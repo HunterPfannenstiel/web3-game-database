@@ -12,7 +12,7 @@ DROP PROCEDURE IF EXISTS public.reclaim_pending_transaction;
 DROP PROCEDURE IF EXISTS public.confirm_transaction;
 
 DROP FUNCTION IF EXISTS public.unnest_tokens;
-DROP FUNCTION IF EXISTS public.get_signature_data;
+DROP FUNCTION IF EXISTS public.get_transaction_data;
 DROP FUNCTION IF EXISTS public.view_successful_transactions;
 DROP FUNCTION IF EXISTS public.view_pending_transactions;
 DROP FUNCTION IF EXISTS public.view_user_tokens;

@@ -42,12 +42,11 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE public.mint_tokens_to_blockchain(user_account_id INTEGER, tokens JSON, mint_valid_till SMALLINT, OUT next_nonce INTEGER)
+CREATE OR REPLACE PROCEDURE public.mint_tokens_to_blockchain(user_account_id INTEGER, tokens JSON, mint_valid_till INTEGER, OUT next_nonce INTEGER, OUT address TEXT)
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS
 $$
-DECLARE address TEXT;
 DECLARE new_transaction_id INTEGER;
 BEGIN
 	SELECT ethereum_address INTO address

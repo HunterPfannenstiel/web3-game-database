@@ -2,6 +2,8 @@
 CALL public.create_account('etherman@gmail.com'::TEXT, '0x0e955494A2936501793119fFB66f901Ca2B11Aac'::TEXT, NULL);
 
 CALL public.create_account('jacobis@gmail.com'::TEXT, '0xb849aaa6dc8bbc499c89728ce16d26e33f86ac09'::TEXT, NULL);
+
+CALL public.create_account(NULL, '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4', NULL);
 --
 
 --Create tokens
@@ -15,7 +17,7 @@ CALL public.modify_balance(2, '[{"tokenId": 1, "amount": 900}, {"tokenId": 2, "a
 --
 
 --Create mint transaction
-CALL public.mint_tokens_to_blockchain(2, '[{"tokenId": 1, "amount": -900}, {"tokenId": 500, "amount": -1}]', 18000::SMALLINT, NULL);
+CALL public.mint_tokens_to_blockchain(2, '[{"tokenId": 1, "amount": -900}, {"tokenId": 500, "amount": -1}]', 18000, NULL, NULL);
 
 CALL public.confirm_transaction('0xb849aaa6dc8bbc499c89728ce16d26e33f86ac09', 0);
 
@@ -26,5 +28,9 @@ WHERE T.transaction_id = 1;
 
 SELECT token_id, amount
 FROM public.token_balance
-WHERE account_id = 2;
+WHERE account_id = 3;
+
+SELECT *
+FROM public.transaction T
+WHERE T.account_id = 3;
 --

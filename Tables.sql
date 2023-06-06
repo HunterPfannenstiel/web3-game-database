@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS public.transaction
 (
     transaction_id serial NOT NULL,
     account_id integer NOT NULL,
-    valid_till smallint NOT NULL,
+    valid_till integer NOT NULL,
     nonce integer NOT NULL,
     created_on timestamp(0) with time zone NOT NULL DEFAULT current_timestamp,
     redeemed_on timestamp(0) with time zone,

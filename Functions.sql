@@ -11,15 +11,15 @@ BEGIN
 END;
 $func$;
 
-CREATE OR REPLACE FUNCTION public.get_signature_data(user_account_id INTEGER, sig_transaction_id INTEGER)
-RETURNS TABLE (ethereum_address TEXT, valid_till SMALLINT, nonce INTEGER, tokens INTEGER[][])
+CREATE OR REPLACE FUNCTION public.get_transaction_data(user_account_id INTEGER, sig_transaction_id INTEGER)
+RETURNS TABLE (ethereum_address TEXT, valid_till INTEGER, nonce INTEGER, tokens JSON[])
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT A.ethereum_address, T.valid_till, T.nonce, array_agg(ARRAY[TT.token_id, TT.amount]) AS tokens
+	SELECT A.ethereum_address, T.valid_till, T.nonce, array_agg(json_build_object('tokenId', TT.token_id, 'amount', TT.amount)) AS tokens
 	FROM public.transaction T
 	JOIN public.account A ON A.account_id = T.account_id
 	JOIN public.transaction_token TT ON TT.transaction_id = T.transaction_id
@@ -61,14 +61,14 @@ END;
 $func$;
 
 CREATE OR REPLACE FUNCTION public.view_user_tokens(user_account_id INTEGER)
-RETURNS TABLE (token_id INTEGER, amount INTEGER)
+RETURNS TABLE ("tokenId" INTEGER, amount INTEGER)
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT TB.token_id, TB.amount
+	SELECT TB.token_id AS "tokenId", TB.amount
 	FROM public.token_balance TB
 	WHERE account_id = user_account_id;
 END;
