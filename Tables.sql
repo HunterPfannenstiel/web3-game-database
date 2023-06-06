@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS public.transaction
     valid_till smallint NOT NULL,
     nonce integer NOT NULL,
     created_on timestamp(0) with time zone NOT NULL DEFAULT current_timestamp,
-    redeemed_on time(0) with time zone,
-    "isPending" boolean NOT NULL DEFAULT true,
-    "isConfirmed" boolean NOT NULL DEFAULT false,
+    redeemed_on timestamp(0) with time zone,
+    is_pending boolean NOT NULL DEFAULT true,
+    is_confirmed boolean NOT NULL DEFAULT false,
     PRIMARY KEY (transaction_id),
     UNIQUE (account_id, nonce)
 );

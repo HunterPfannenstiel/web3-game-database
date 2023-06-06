@@ -15,7 +15,9 @@ CALL public.modify_balance(2, '[{"tokenId": 1, "amount": 900}, {"tokenId": 2, "a
 --
 
 --Create mint transaction
-CALL public.mint_tokens_to_blockchain(2, '[{"tokenId": 1, "amount": -900}, {"tokenId": 500, "amount": -1}]', 18000::SMALLINT, NULL)
+CALL public.mint_tokens_to_blockchain(2, '[{"tokenId": 1, "amount": -900}, {"tokenId": 500, "amount": -1}]', 18000::SMALLINT, NULL);
+
+CALL public.confirm_transaction('0xb849aaa6dc8bbc499c89728ce16d26e33f86ac09', 0);
 
 SELECT token_id, amount
 FROM public.transaction T

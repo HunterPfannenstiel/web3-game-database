@@ -71,3 +71,40 @@ BEGIN
 	FROM public.unnest_tokens(tokens) tb;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE public.reclaim_pending_transaction(user_account_id INTEGER, user_transaction_id INTEGER)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$$
+DECLARE tokens JSON;
+BEGIN
+	SELECT json_agg(json_build_object('tokenId', TT.token_id, 'amount', TT.amount)) INTO tokens
+	FROM public.transaction_token TT
+	JOIN public.transaction T ON T.transaction_id = TT.transaction_id
+	WHERE TT.transaction_id = user_transaction_id AND T.account_id = user_account_id AND is_pending = TRUE AND is_confirmed = FALSE;
+	
+	UPDATE public.transaction
+	SET is_pending = FALSE
+	WHERE transaction_id = user_transaction_id;
+	
+	CALL public.modify_balance(user_account_id, tokens);
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE public.confirm_transaction(address TEXT, transaction_nonce INTEGER)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$$
+DECLARE address_account_id INTEGER;
+BEGIN
+	SELECT account_id INTO address_account_id
+	FROM public.account A
+	WHERE A.ethereum_address = address;
+	
+	UPDATE public.transaction
+	SET is_pending = FALSE, is_confirmed = TRUE, redeemed_on = current_timestamp
+	WHERE account_id = address_account_id AND nonce = transaction_nonce;
+END;
+$$;
