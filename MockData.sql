@@ -28,9 +28,8 @@ WHERE T.transaction_id = 1;
 
 SELECT token_id, amount
 FROM public.token_balance
-WHERE account_id = 3;
+WHERE account_id = 1;
 
-SELECT *
-FROM public.transaction T
-WHERE T.account_id = 3;
+SELECT * FROM public.transaction
+
 --

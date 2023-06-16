@@ -73,3 +73,18 @@ BEGIN
 	WHERE account_id = user_account_id;
 END;
 $func$;
+
+CREATE OR REPLACE FUNCTION public.get_reclaim_info(reclaim_transaction_id INTEGER)
+RETURNS TABLE (valid_till INTEGER, account_id INTEGER, account_address TEXT, is_pending BOOLEAN, nonce INTEGER)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT T.valid_till, T.account_id, A.ethereum_address, T.is_pending, T.nonce
+	FROM public.transaction T
+	JOIN public.account A ON A.account_id = T.account_id
+	WHERE T.transaction_id = reclaim_transaction_id;
+END;
+$func$;

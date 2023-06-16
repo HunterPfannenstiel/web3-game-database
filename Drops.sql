@@ -16,3 +16,4 @@ DROP FUNCTION IF EXISTS public.get_transaction_data;
 DROP FUNCTION IF EXISTS public.view_successful_transactions;
 DROP FUNCTION IF EXISTS public.view_pending_transactions;
 DROP FUNCTION IF EXISTS public.view_user_tokens;
+DROP FUNCTION IF EXISTS public.get_reclaim_info;
