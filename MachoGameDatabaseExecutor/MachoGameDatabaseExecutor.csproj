@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\0001 Create.sql" />
+    <None Remove="Scripts\0001 Drops.sql" />
+    <None Remove="Scripts\0002 Tables.sql" />
+    <None Remove="Scripts\0003 Functions.sql" />
+    <None Remove="Scripts\0004 Procedures.sql" />
+    <None Remove="Scripts\0005 MockData.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\0001 Drops.sql" />
+    <EmbeddedResource Include="Scripts\0002 Tables.sql" />
+    <EmbeddedResource Include="Scripts\0003 Functions.sql" />
+    <EmbeddedResource Include="Scripts\0004 Procedures.sql" />
+    <EmbeddedResource Include="Scripts\0005 MockData.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dbup-postgresql" Version="5.0.8" />
+  </ItemGroup>
+
+</Project>
