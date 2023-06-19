@@ -1,9 +1,11 @@
 --Create accounts
-CALL public.create_account('etherman@gmail.com'::TEXT, '0x0e955494A2936501793119fFB66f901Ca2B11Aac'::TEXT, NULL);
 
-CALL public.create_account('jacobis@gmail.com'::TEXT, '0xb849aaa6dc8bbc499c89728ce16d26e33f86ac09'::TEXT, NULL);
+--Password is 'MachoMacho'
+CALL public.create_account('MachoKat', '$2b$12$ymDrk0oBg/NRgHWZpXHdzubV6eWmV7UZXM3tV97.O6rJv1y0AOKXO','etherman@gmail.com'::TEXT, '0x0e955494A2936501793119fFB66f901Ca2B11Aac'::TEXT, NULL);
 
-CALL public.create_account(NULL, '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4', NULL);
+CALL public.create_account('Jacobis', '$2b$12$ymDrk0oBg/NRgHWZpXHdzubV6eWmV7UZXM3tV97.O6rJv1y0AOKXO', 'jacobis@gmail.com'::TEXT, '0xb849aaa6dc8bbc499c89728ce16d26e33f86ac09'::TEXT, NULL);
+
+CALL public.create_account('Smacho', '$2b$12$ymDrk0oBg/NRgHWZpXHdzubV6eWmV7UZXM3tV97.O6rJv1y0AOKXO', NULL, '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4', NULL);
 --
 
 --Create tokens

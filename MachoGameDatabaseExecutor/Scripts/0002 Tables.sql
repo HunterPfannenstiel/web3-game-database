@@ -6,13 +6,21 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS public.account
 (
     account_id serial NOT NULL,
+	user_name character varying(30) NOT NULL,
+	hashed_password text NOT NULL,
     email text,
     ethereum_address text,
     next_nonce integer NOT NULL DEFAULT 0,
     PRIMARY KEY (account_id),
+	UNIQUE (user_name),
     UNIQUE (email),
-    UNIQUE (ethereum_address),
-	CHECK (ethereum_address IS NOT NULL OR email IS NOT NULL)
+    UNIQUE (ethereum_address)
+);
+
+CREATE TABLE IF NOT EXISTS public.session (
+	account_id integer NOT NULL,
+	jwt TEXT NOT NULL,
+	PRIMARY KEY (account_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.token_balance
@@ -50,6 +58,13 @@ CREATE TABLE IF NOT EXISTS public.transaction_token
     amount integer NOT NULL,
     PRIMARY KEY (transaction_id, token_id)
 );
+
+ALTER TABLE IF EXISTS public.session
+    ADD FOREIGN KEY (account_id)
+    REFERENCES public.account (account_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE CASCADE
+    NOT VALID;
 
 ALTER TABLE IF EXISTS public.token_balance
     ADD FOREIGN KEY (token_id)

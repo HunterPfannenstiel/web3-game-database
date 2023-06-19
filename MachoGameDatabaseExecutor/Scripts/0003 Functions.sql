@@ -28,6 +28,8 @@ BEGIN
 END;
 $func$;
 
+SELECT * FROM public.get_transaction_data(2, 1);
+
 CREATE OR REPLACE FUNCTION public.view_successful_transactions(user_account_id INTEGER)
 RETURNS TABLE (created_on timestamp(0) with time zone, redeemed_on timestamp(0) with time zone, tokens INTEGER[][])
 SECURITY DEFINER
@@ -74,6 +76,8 @@ BEGIN
 END;
 $func$;
 
+SELECT * FROM public.view_user_tokens(1);
+
 CREATE OR REPLACE FUNCTION public.get_reclaim_info(reclaim_transaction_id INTEGER)
 RETURNS TABLE (valid_till INTEGER, account_id INTEGER, account_address TEXT, is_pending BOOLEAN, nonce INTEGER)
 SECURITY DEFINER
@@ -88,3 +92,20 @@ BEGIN
 	WHERE T.transaction_id = reclaim_transaction_id;
 END;
 $func$;
+
+CREATE OR REPLACE FUNCTION public.get_user_password_and_session("name" CHARACTER VARYING(30))
+RETURNS TABLE (account_id INTEGER, hashed_password TEXT, jwt TEXT)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT A.account_id, A.hashed_password, S.jwt
+	FROM public.account A
+	LEFT JOIN public.session S ON S.account_id = A.account_id
+	WHERE A.user_name = "name";
+END;
+$func$;
+
+SELECT * FROM public.get_user_password_and_session('MachoKat');

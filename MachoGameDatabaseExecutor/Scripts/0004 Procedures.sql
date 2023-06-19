@@ -1,11 +1,11 @@
-CREATE OR REPLACE PROCEDURE public.create_account(user_email TEXT, user_ethereum_address TEXT, OUT new_account_id INTEGER)
+CREATE OR REPLACE PROCEDURE public.create_account(user_name CHARACTER VARYING(30), hashed_password TEXT, user_email TEXT, user_ethereum_address TEXT, OUT new_account_id INTEGER)
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS
 $$
 BEGIN
-	INSERT INTO public.account(email, ethereum_address)
-	VALUES(user_email, user_ethereum_address)
+	INSERT INTO public.account(user_name, hashed_password, email, ethereum_address)
+	VALUES(user_name, hashed_password, user_email, user_ethereum_address)
 	RETURNING account_id INTO new_account_id;
 END;
 $$;
@@ -105,5 +105,22 @@ BEGIN
 	UPDATE public.transaction
 	SET is_pending = FALSE, is_confirmed = TRUE, redeemed_on = current_timestamp
 	WHERE account_id = address_account_id AND nonce = transaction_nonce;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE public.create_session(account_id INTEGER, jwt TEXT)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$$
+DECLARE address_account_id INTEGER;
+BEGIN
+	MERGE INTO public.session T
+	USING (SELECT account_id, jwt) S ON S.account_id = T.account_id
+	WHEN MATCHED THEN
+		UPDATE SET jwt = S.jwt
+	WHEN NOT MATCHED THEN
+		INSERT (account_id, jwt)
+		VALUES(S.account_id, S.jwt);
 END;
 $$;
