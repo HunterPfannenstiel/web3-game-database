@@ -12,7 +12,7 @@ END;
 $func$;
 
 CREATE OR REPLACE FUNCTION public.get_transaction_data(user_account_id INTEGER, sig_transaction_id INTEGER)
-RETURNS TABLE (ethereum_address TEXT, valid_till INTEGER, nonce INTEGER, tokens JSON[])
+RETURNS TABLE (ethereum_address CHARACTER VARYING(42), valid_till INTEGER, nonce INTEGER, tokens JSON[])
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS
@@ -77,6 +77,25 @@ END;
 $func$;
 
 SELECT * FROM public.view_user_tokens(1);
+
+CREATE OR REPLACE FUNCTION public.view_user_tokens_with_metadata(user_account_id INTEGER)
+RETURNS TABLE ("tokenId" INTEGER, "name" TEXT, amount INTEGER, image TEXT, "type" TEXT, colors JSON)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT TB.token_id, T.name, TB.amount, T.image, TT.type, json_build_object('borderColor', CC.border_color, 'fillColor', CC.fill_color)
+	FROM public.token_balance TB
+	JOIN public.token T ON T.token_id = TB.token_id
+	JOIN public.token_type TT ON TT.token_type_id = T.token_type_id
+	LEFT JOIN public.coin_colors CC ON CC.coin_colors_id = T.coin_colors_id
+	WHERE account_id = user_account_id;
+END;
+$func$;
+
+SELECT * FROM public.view_user_tokens_with_metadata(1);
 
 CREATE OR REPLACE FUNCTION public.get_reclaim_info(reclaim_transaction_id INTEGER)
 RETURNS TABLE (valid_till INTEGER, account_id INTEGER, account_address TEXT, is_pending BOOLEAN, nonce INTEGER)

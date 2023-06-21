@@ -8,9 +8,20 @@ CALL public.create_account('Jacobis', '$2b$12$ymDrk0oBg/NRgHWZpXHdzubV6eWmV7UZXM
 CALL public.create_account('Smacho', '$2b$12$ymDrk0oBg/NRgHWZpXHdzubV6eWmV7UZXM3tV97.O6rJv1y0AOKXO', NULL, '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4', NULL);
 --
 
+ALTER SEQUENCE public.token_type_token_type_id_seq RESTART WITH 1;
+
+INSERT INTO public.token_type("type")
+VALUES ('coin'), ('item');
+
+INSERT INTO public.coin_colors(border_color, fill_color)
+VALUES('#ee0476', '#0a81f4');
+
 --Create tokens
-INSERT INTO public.token(token_id)
-VALUES (1), (2), (3), (500);
+INSERT INTO public.token(token_id, "name", image, token_type_id, coin_colors_id)
+VALUES (1, 'Macho Coin', 'https://s2.coinmarketcap.com/static/img/coins/64x64/11690.png', 1, 1), 
+(2, 'Pepe Potion', 'https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png', 2, NULL), 
+(3, 'Ape Apples', 'https://s2.coinmarketcap.com/static/img/coins/64x64/7257.png', 2, NULL), 
+(500, 'Unicorn', 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png', 2, NULL);
 
 --Update token amounts
 CALL public.modify_balance(1, '[{"tokenId": 1, "amount": 1000}, {"tokenId": 2, "amount": 25}, {"tokenId": 3, "amount": 22}, {"tokenId": 500, "amount": 1}]');

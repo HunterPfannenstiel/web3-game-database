@@ -22,4 +22,5 @@ DROP FUNCTION IF EXISTS public.view_user_tokens;
 DROP FUNCTION IF EXISTS public.get_reclaim_info;
 DROP FUNCTION IF EXISTS public.get_user_password_and_session;
 DROP FUNCTION IF EXISTS public.check_address_existence;
-DROP FUNCTION IF EXISTS public.get_ethereum_account_id
+DROP FUNCTION IF EXISTS public.get_ethereum_account_id;
+DROP FUNCTION IF EXISTS public.view_user_tokens_with_metadata;

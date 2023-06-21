@@ -31,9 +31,29 @@ CREATE TABLE IF NOT EXISTS public.token_balance
     PRIMARY KEY (account_id, token_id)
 );
 
+
+CREATE TABLE IF NOT EXISTS public.token_type
+(
+    token_type_id smallserial NOT NULL,
+	"type" text NOT NULL,
+    PRIMARY KEY (token_type_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.coin_colors
+(
+    coin_colors_id smallserial NOT NULL,
+	border_color character varying (7) NOT NULL,
+	fill_color character varying (7) NOT NULL,
+    PRIMARY KEY (coin_colors_id)
+);
+
 CREATE TABLE IF NOT EXISTS public.token
 (
     token_id integer NOT NULL,
+	"name" text NOT NULL,
+	image text NOT NULL,
+	token_type_id smallint NOT NULL,
+	coin_colors_id smallint,
     PRIMARY KEY (token_id)
 );
 
@@ -58,6 +78,20 @@ CREATE TABLE IF NOT EXISTS public.transaction_token
     amount integer NOT NULL,
     PRIMARY KEY (transaction_id, token_id)
 );
+
+ALTER TABLE IF EXISTS public.token
+    ADD FOREIGN KEY (token_type_id)
+    REFERENCES public.token_type (token_type_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+	
+ALTER TABLE IF EXISTS public.token
+    ADD FOREIGN KEY (coin_colors_id)
+    REFERENCES public.coin_colors (coin_colors_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
 
 ALTER TABLE IF EXISTS public.session
     ADD FOREIGN KEY (account_id)
