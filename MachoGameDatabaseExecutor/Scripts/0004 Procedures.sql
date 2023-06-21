@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE public.create_account(user_name CHARACTER VARYING(30), hashed_password TEXT, user_email TEXT, user_ethereum_address TEXT, OUT new_account_id INTEGER)
+CREATE OR REPLACE PROCEDURE public.create_account(user_name CHARACTER VARYING(30), hashed_password TEXT, user_email TEXT, user_ethereum_address CHARACTER VARYING(42), OUT new_account_id INTEGER)
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS
@@ -100,7 +100,7 @@ DECLARE address_account_id INTEGER;
 BEGIN
 	SELECT account_id INTO address_account_id
 	FROM public.account A
-	WHERE A.ethereum_address = address;
+	WHERE A.ethereum_address ILIKE address;
 	
 	UPDATE public.transaction
 	SET is_pending = FALSE, is_confirmed = TRUE, redeemed_on = current_timestamp
@@ -122,5 +122,29 @@ BEGIN
 	WHEN NOT MATCHED THEN
 		INSERT (account_id, jwt)
 		VALUES(S.account_id, S.jwt);
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE public.link_ethereum_address(user_account_id INTEGER, address CHARACTER VARYING(42))
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$$
+DECLARE address_exists BOOLEAN;
+BEGIN
+	SELECT CAE.does_exist INTO address_exists 
+	FROM public.check_address_existence(address) CAE;
+	
+	IF address_exists THEN
+		RAISE EXCEPTION 'Ethereum address is already linked to an account!';
+	END IF;
+	
+	IF EXISTS (SELECT 1 FROM public.account A WHERE A.account_id = user_account_id AND A.ethereum_address IS NOT NULL) THEN
+		RAISE EXCEPTION 'An ethereum address is already linked to account %!', user_account_id;
+	END IF;
+	
+	UPDATE public.account
+		SET ethereum_address = address
+	WHERE account_id = user_account_id;
 END;
 $$;

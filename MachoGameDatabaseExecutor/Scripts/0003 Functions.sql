@@ -109,3 +109,36 @@ END;
 $func$;
 
 SELECT * FROM public.get_user_password_and_session('MachoKat');
+
+CREATE OR REPLACE FUNCTION public.check_address_existence(address CHARACTER VARYING(42))
+RETURNS TABLE (does_exist BOOLEAN)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$func$
+BEGIN
+	IF EXISTS (SELECT 1 FROM public.account A WHERE A.ethereum_address ILIKE address) THEN
+		RETURN QUERY
+		SELECT true;
+	ELSE
+		RETURN QUERY
+		SELECT false;
+	END IF;
+END;
+$func$;
+
+CREATE OR REPLACE FUNCTION public.get_ethereum_account_id(address CHARACTER VARYING(42))
+RETURNS TABLE (account_id INTEGER)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT A.account_id
+	FROM public.account A
+	WHERE A.ethereum_address ILIKE address;
+END;
+$func$;
+
+SELECT * FROM public.get_ethereum_account_id('0x0e955494A2936501793119fFB66f901Ca2B11Aac')

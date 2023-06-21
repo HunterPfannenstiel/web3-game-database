@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.account
 	user_name character varying(30) NOT NULL,
 	hashed_password text NOT NULL,
     email text,
-    ethereum_address text,
+    ethereum_address character varying(42),
     next_nonce integer NOT NULL DEFAULT 0,
     PRIMARY KEY (account_id),
 	UNIQUE (user_name),
