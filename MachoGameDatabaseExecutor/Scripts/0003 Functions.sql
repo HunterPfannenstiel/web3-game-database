@@ -46,21 +46,42 @@ BEGIN
 END;
 $func$;
 
-CREATE OR REPLACE FUNCTION public.view_pending_transactions(user_account_id INTEGER)
-RETURNS TABLE (created_on timestamp(0) with time zone, tokens INTEGER[][])
+CREATE OR REPLACE FUNCTION public.view_transactions(user_account_id INTEGER)
+RETURNS TABLE (created_on timestamp(0) with time zone, completed_on timestamp(0) with time zone, tokens JSON[], pending BOOLEAN, confirmed BOOLEAN, transaction_id INTEGER)
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT T.created_on, array_agg(ARRAY[TT.token_id, TT.amount]) AS tokens
+	SELECT T.created_on, T.redeemed_on, array_agg(json_build_object('tokenId', TT.token_id, 'amount', TT.amount)) AS tokens, T.is_pending, T.is_confirmed, T.transaction_id
 	FROM public.transaction T
 	JOIN public.transaction_token TT ON TT.transaction_id = T.transaction_id
-	WHERE T.account_id = user_account_id AND T.is_pending = TRUE
-	GROUP BY T.created_on, T.redeemed_on;
+	WHERE T.account_id = user_account_id
+	GROUP BY T.created_on, T.redeemed_on, T.is_pending, T.is_confirmed, T.transaction_id
+	ORDER BY T.created_on DESC;
 END;
 $func$;
+
+SELECT * FROM public.view_transactions(1);
+
+CREATE OR REPLACE FUNCTION public.view_pending_transactions(user_account_id INTEGER)
+RETURNS TABLE (created_on timestamp(0) with time zone, tokens INTEGER[][], transaction_id INTEGER)
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT T.created_on, array_agg(ARRAY[TT.token_id, TT.amount]) AS tokens, T.transaction_id
+	FROM public.transaction T
+	JOIN public.transaction_token TT ON TT.transaction_id = T.transaction_id
+	WHERE T.account_id = 1 AND T.is_pending = TRUE
+	GROUP BY T.created_on, T.redeemed_on,  T.transaction_id;
+END;
+$func$;
+
+SELECT * FROM public.view_pending_transactions(1);
 
 CREATE OR REPLACE FUNCTION public.view_user_tokens(user_account_id INTEGER)
 RETURNS TABLE ("tokenId" INTEGER, amount INTEGER)
@@ -78,24 +99,22 @@ $func$;
 
 SELECT * FROM public.view_user_tokens(1);
 
-CREATE OR REPLACE FUNCTION public.view_user_tokens_with_metadata(user_account_id INTEGER)
-RETURNS TABLE ("tokenId" INTEGER, "name" TEXT, amount INTEGER, image TEXT, "type" TEXT, colors JSON)
+CREATE OR REPLACE FUNCTION public.view_token_metadata()
+RETURNS TABLE (tokens JSON)
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT TB.token_id, T.name, TB.amount, T.image, TT.type, json_build_object('borderColor', CC.border_color, 'fillColor', CC.fill_color)
-	FROM public.token_balance TB
-	JOIN public.token T ON T.token_id = TB.token_id
+	SELECT json_object_agg(T.token_id, json_build_object('name', T.name, 'image', T.image, 'type', TT.type, 'colors', json_build_object('borderColor', CC.border_color, 'fillColor', CC.fill_color)))
+	FROM public.token T
 	JOIN public.token_type TT ON TT.token_type_id = T.token_type_id
-	LEFT JOIN public.coin_colors CC ON CC.coin_colors_id = T.coin_colors_id
-	WHERE account_id = user_account_id;
+	LEFT JOIN public.coin_colors CC ON CC.coin_colors_id = T.coin_colors_id;
 END;
 $func$;
 
-SELECT * FROM public.view_user_tokens_with_metadata(1);
+SELECT * FROM public.view_token_metadata();
 
 CREATE OR REPLACE FUNCTION public.get_reclaim_info(reclaim_transaction_id INTEGER)
 RETURNS TABLE (valid_till INTEGER, account_id INTEGER, account_address TEXT, is_pending BOOLEAN, nonce INTEGER)
