@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS public.account
 CREATE TABLE IF NOT EXISTS public.session (
 	account_id integer NOT NULL,
 	jwt TEXT NOT NULL,
+	expire_date timestamp(0) with time zone NOT NULL,
 	PRIMARY KEY (account_id)
 );
 
@@ -63,7 +64,7 @@ CREATE TABLE IF NOT EXISTS public.transaction
     account_id integer NOT NULL,
     valid_till integer NOT NULL,
     nonce integer NOT NULL,
-    created_on timestamp(0) with time zone NOT NULL DEFAULT current_timestamp,
+    created_on timestamp(0) with time zone NOT NULL,
     redeemed_on timestamp(0) with time zone,
     is_pending boolean NOT NULL DEFAULT true,
     is_confirmed boolean NOT NULL DEFAULT false,
@@ -77,6 +78,22 @@ CREATE TABLE IF NOT EXISTS public.transaction_token
     token_id integer NOT NULL,
     amount integer NOT NULL,
     PRIMARY KEY (transaction_id, token_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.game_mint
+(
+    game_mint_id serial NOT NULL,
+    account_id integer NOT NULL,
+    redeemed_on timestamp(0) with time zone,
+    PRIMARY KEY (game_mint_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.game_mint_token
+(
+   	game_mint_id integer NOT NULL,
+    token_id integer NOT NULL,
+    amount integer NOT NULL,
+    PRIMARY KEY (game_mint_id, token_id)
 );
 
 ALTER TABLE IF EXISTS public.token
@@ -136,6 +153,29 @@ ALTER TABLE IF EXISTS public.transaction_token
 
 
 ALTER TABLE IF EXISTS public.transaction_token
+    ADD FOREIGN KEY (token_id)
+    REFERENCES public.token (token_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+	
+ALTER TABLE IF EXISTS public.game_mint
+    ADD FOREIGN KEY (account_id)
+    REFERENCES public.account (account_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.game_mint_token
+    ADD FOREIGN KEY (game_mint_id)
+    REFERENCES public.game_mint (game_mint_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.game_mint_token
     ADD FOREIGN KEY (token_id)
     REFERENCES public.token (token_id) MATCH SIMPLE
     ON UPDATE NO ACTION

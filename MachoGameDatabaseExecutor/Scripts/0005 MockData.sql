@@ -21,7 +21,7 @@ INSERT INTO public.token(token_id, "name", image, token_type_id, coin_colors_id)
 VALUES (1, 'Macho Coin', 'https://s2.coinmarketcap.com/static/img/coins/64x64/11690.png', 1, 1), 
 (2, 'Pepe Potion', 'https://s2.coinmarketcap.com/static/img/coins/64x64/24478.png', 2, NULL), 
 (3, 'Ape Apples', 'https://s2.coinmarketcap.com/static/img/coins/64x64/7257.png', 2, NULL), 
-(500, 'Unicorn', 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png', 2, NULL);
+(500, 'Yule Steed', 'https://pin.ski/44iizUH', 2, NULL);
 
 --Update token amounts
 CALL public.modify_balance(1, '[{"tokenId": 1, "amount": 1000}, {"tokenId": 2, "amount": 25}, {"tokenId": 3, "amount": 22}, {"tokenId": 500, "amount": 1}]');
@@ -30,7 +30,7 @@ CALL public.modify_balance(2, '[{"tokenId": 1, "amount": 900}, {"tokenId": 2, "a
 --
 
 --Create mint transaction
-CALL public.mint_tokens_to_blockchain(2, '[{"tokenId": 1, "amount": -900}, {"tokenId": 500, "amount": -1}]', 18000, NULL, NULL);
+CALL public.mint_tokens_to_blockchain(2, '[{"tokenId": 1, "amount": -900}, {"tokenId": 500, "amount": -1}]', 18000, current_timestamp, NULL, NULL);
 
 CALL public.confirm_transaction('0xb849aaa6dc8bbc499c89728ce16d26e33f86ac09', 0);
 
@@ -43,6 +43,8 @@ SELECT token_id, amount
 FROM public.token_balance
 WHERE account_id = 1;
 
-SELECT * FROM public.transaction
+SELECT GM.account_id, array_agg(GMT.token_id) FROM public.game_mint GM
+JOIN public.game_mint_token GMT ON GMT.game_mint_id = GM.game_mint_id
+GROUP BY GM.game_mint_id, GM.account_id
 
 --
